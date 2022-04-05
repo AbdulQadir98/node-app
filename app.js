@@ -1,8 +1,11 @@
+const Joi = require('joi'); // joi module returns a class
 const express = require('express'); // express module will return a function
 const app = express(); 
 // express() is a type of object with http methods
 // Ex - app.get(), app.post(), app.put(), app.delete()
 // these methods take 2 args- url and a call back function with 2 args req and res
+
+app.use(express.json());
 
 const courses = [
     {id : 1, name: 'course1'},
@@ -29,6 +32,32 @@ app.get('/api/courses/:id/:name', (req, res) => {
     res.send(req.query);  // to print query param // ex - http://localhost:3000/api/courses/2/maths?stu=abdul
 });
 
+app.post('/api/courses', (req, res) => {
+    // input validation using Joi
+    // define a schema for the object
+    const schema ={
+        name: Joi.string().min(3).required()  // name should be more than 3 chars and not empty
+    };
+
+    const result = Joi.validate(req.body, schema);
+    if(result.error){
+        res.status(400).send(result.error.details[0].message);
+        return;
+    }
+
+    const course ={
+        id: courses.length +1,
+        name: req.body.name  //have to enable parsing of JASON objects in the body of request
+    };
+    courses.push(course); //push object into courses array
+    res.send(course);
+
+});
+
+//put - update method
+app.put('/api/courses/:id', (req, res) => {
+    
+});
 
 
 
